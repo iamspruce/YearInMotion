@@ -66,42 +66,63 @@ export class InstagramUploader extends BaseUploader {
         const videoUrl = await this.uploadToTemporaryHost(videoPath);
 
         // Step 1: Create media container
-        const containerResponse = await axios.post<{ id: string }>(
-            `${IG_GRAPH_URL}/${this.instagramId}/media`,
-            {
-                media_type: 'REELS',
-                video_url: videoUrl,
-                caption,
-                share_to_feed: true,
-            },
-            {
-                params: { access_token: this.accessToken },
+        let containerId: string;
+        try {
+            const containerResponse = await axios.post<{ id: string }>(
+                `${IG_GRAPH_URL}/${this.instagramId}/media`,
+                {
+                    media_type: 'REELS',
+                    video_url: videoUrl,
+                    caption,
+                    share_to_feed: true,
+                },
+                {
+                    params: { access_token: this.accessToken },
+                }
+            );
+            containerId = containerResponse.data.id;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                logger.error('Instagram Step 1 (Create Container) failed', {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                });
             }
-        );
+            throw error;
+        }
 
-        const containerId = containerResponse.data.id;
         logger.info('Instagram container created', { containerId });
 
         // Step 2: Wait for container to be ready
         await this.pollContainerStatus(containerId);
 
         // Step 3: Publish the container
-        const publishResponse = await axios.post<{ id: string }>(
-            `${IG_GRAPH_URL}/${this.instagramId}/media_publish`,
-            {
-                creation_id: containerId,
-            },
-            {
-                params: { access_token: this.accessToken },
+        try {
+            const publishResponse = await axios.post<{ id: string }>(
+                `${IG_GRAPH_URL}/${this.instagramId}/media_publish`,
+                {
+                    creation_id: containerId,
+                },
+                {
+                    params: { access_token: this.accessToken },
+                }
+            );
+
+            logger.info('Instagram Reel published', { mediaId: publishResponse.data.id });
+
+            return {
+                mediaId: publishResponse.data.id,
+                containerId,
+            };
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                logger.error('Instagram Step 3 (Publish) failed', {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                });
             }
-        );
-
-        logger.info('Instagram Reel published', { mediaId: publishResponse.data.id });
-
-        return {
-            mediaId: publishResponse.data.id,
-            containerId,
-        };
+            throw error;
+        }
     }
 
     /**
@@ -109,24 +130,34 @@ export class InstagramUploader extends BaseUploader {
      */
     private async pollContainerStatus(containerId: string, maxAttempts = 30): Promise<void> {
         for (let i = 0; i < maxAttempts; i++) {
-            const statusResponse = await axios.get<{ status_code: string }>(`${IG_GRAPH_URL}/${containerId}`, {
-                params: {
-                    fields: 'status_code',
-                    access_token: this.accessToken,
-                },
-            });
+            try {
+                const statusResponse = await axios.get<{ status_code: string }>(`${IG_GRAPH_URL}/${containerId}`, {
+                    params: {
+                        fields: 'status_code',
+                        access_token: this.accessToken,
+                    },
+                });
 
-            const statusCode = statusResponse.data.status_code;
-            logger.debug('Container status', {
-                containerId,
-                statusCode,
-                attempt: i + 1,
-            });
+                const statusCode = statusResponse.data.status_code;
+                logger.debug('Container status', {
+                    containerId,
+                    statusCode,
+                    attempt: i + 1,
+                });
 
-            if (statusCode === 'FINISHED') {
-                return;
-            } else if (statusCode === 'ERROR') {
-                throw new Error('Instagram container processing failed');
+                if (statusCode === 'FINISHED') {
+                    return;
+                } else if (statusCode === 'ERROR') {
+                    throw new Error('Instagram container processing failed');
+                }
+            } catch (error) {
+                if (axios.isAxiosError(error)) {
+                    logger.error('Instagram Polling failed', {
+                        status: error.response?.status,
+                        data: error.response?.data,
+                    });
+                }
+                throw error;
             }
 
             // Wait 2 seconds before next poll

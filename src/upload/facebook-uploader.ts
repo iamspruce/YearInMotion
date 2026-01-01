@@ -58,16 +58,27 @@ export class FacebookUploader extends BaseUploader {
         });
 
         // Step 1: Initialize upload session
-        const initResponse = await axios.post<{
-            video_id: string;
-            upload_url: string;
-        }>(`${FB_GRAPH_URL}/${this.pageId}/video_reels`, {
-            upload_phase: 'start',
-            access_token: this.accessToken,
-        });
-
-        const videoId = initResponse.data.video_id;
-        const uploadUrl = initResponse.data.upload_url;
+        let videoId: string;
+        let uploadUrl: string;
+        try {
+            const initResponse = await axios.post<{
+                video_id: string;
+                upload_url: string;
+            }>(`${FB_GRAPH_URL}/${this.pageId}/video_reels`, {
+                upload_phase: 'start',
+                access_token: this.accessToken,
+            });
+            videoId = initResponse.data.video_id;
+            uploadUrl = initResponse.data.upload_url;
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                logger.error('Facebook Step 1 (Init) failed', {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                });
+            }
+            throw error;
+        }
 
         logger.info('Facebook upload initialized', { videoId });
 
@@ -88,10 +99,9 @@ export class FacebookUploader extends BaseUploader {
             });
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                logger.error('Facebook upload step 2 failed', {
+                logger.error('Facebook Step 2 (Upload) failed', {
                     status: error.response?.status,
                     data: error.response?.data,
-                    headers: error.response?.headers,
                 });
             }
             throw error;
@@ -100,25 +110,35 @@ export class FacebookUploader extends BaseUploader {
         logger.info('Facebook video uploaded', { videoId });
 
         // Step 3: Finalize and publish
-        const finalizeResponse = await axios.post<{
-            success: boolean;
-        }>(`${FB_GRAPH_URL}/${this.pageId}/video_reels`, {
-            video_id: videoId,
-            upload_phase: 'finish',
-            video_state: 'PUBLISHED',
-            description: caption,
-            access_token: this.accessToken,
-        });
+        try {
+            const finalizeResponse = await axios.post<{
+                success: boolean;
+            }>(`${FB_GRAPH_URL}/${this.pageId}/video_reels`, {
+                video_id: videoId,
+                upload_phase: 'finish',
+                video_state: 'PUBLISHED',
+                description: caption,
+                access_token: this.accessToken,
+            });
 
-        logger.info('Facebook Reel published', {
-            videoId,
-            success: finalizeResponse.data.success,
-        });
+            logger.info('Facebook Reel published', {
+                videoId,
+                success: finalizeResponse.data.success,
+            });
 
-        return {
-            videoId,
-            success: finalizeResponse.data.success,
-        };
+            return {
+                videoId,
+                success: finalizeResponse.data.success,
+            };
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                logger.error('Facebook Step 3 (Finalize) failed', {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                });
+            }
+            throw error;
+        }
     }
 }
 
