@@ -16,6 +16,8 @@
     "format": "prettier --write \"src/**/*.ts\" \"tests/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\" \"tests/**/*.ts\"",
     "dry-run": "DRY_RUN=true tsx src/index.ts",
+    "test-post": "DRY_RUN=false FORCE_POST=true tsx src/index.ts",
+    "test-dry-run": "DRY_RUN=true FORCE_POST=true tsx src/index.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [

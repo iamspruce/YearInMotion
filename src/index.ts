@@ -41,8 +41,9 @@ async function main(): Promise<void> {
         // Step 5: Check if we should generate new content
         const lastState = await getLastPosted(config.gist.id, config.gist.token);
         const shouldGenerate = await generator.shouldGenerate(lastState);
+        const isForced = process.env.FORCE_POST === 'true';
 
-        if (!shouldGenerate) {
+        if (!shouldGenerate && !isForced) {
             logger.info('Already posted for this percentage - skipping', {
                 percent: yearProgress.percent,
             });
