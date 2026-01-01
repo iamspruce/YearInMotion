@@ -57,6 +57,8 @@ jobs:
         run: echo "${{ secrets.APP_ENV }}" > .env
 
       - name: Run daily post
+        env:
+          DRY_RUN: ${{ github.event.inputs.dry_run }}
         run: npm start
 
       - name: Upload logs on failure
