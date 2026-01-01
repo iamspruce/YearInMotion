@@ -128,7 +128,7 @@ export class InstagramUploader extends BaseUploader {
     /**
      * Poll container status until ready or failed
      */
-    private async pollContainerStatus(containerId: string, maxAttempts = 30): Promise<void> {
+    private async pollContainerStatus(containerId: string, maxAttempts = 60): Promise<void> {
         for (let i = 0; i < maxAttempts; i++) {
             try {
                 const statusResponse = await axios.get<{ status_code: string }>(`${IG_GRAPH_URL}/${containerId}`, {

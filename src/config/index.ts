@@ -99,8 +99,8 @@ export const RENDER_CONFIG = {
     width: 1080,
     height: 1920,
     fps: 30,
-    minDuration: 3, // Minimum video length
-    animationSpeed: 20, // Percent per second (e.g., 20% = 5 seconds for 100%)
+    minDuration: 15, // Increased from 3 for better monetization eligibility
+    animationSpeed: 10, // Slower animation to fill the duration
     pauseDuration: 2, // Seconds to hold at the end
     fontFamily: 'Primary',
     fontSize: 80,
