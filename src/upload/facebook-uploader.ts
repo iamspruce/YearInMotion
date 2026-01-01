@@ -93,6 +93,7 @@ export class FacebookUploader extends BaseUploader {
                     ...formData.getHeaders(),
                     Authorization: `OAuth ${this.accessToken}`,
                     'file_size': videoSize,
+                    'offset': 0,
                 },
                 maxContentLength: Infinity,
                 maxBodyLength: Infinity,
