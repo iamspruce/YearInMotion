@@ -1,0 +1,18 @@
+{
+  "yearProgress": {
+    "templates": [
+      "{year} is {percent}% complete",
+      "{year} progress: {percent}% done",
+      "{year} is {percent}% through"
+    ],
+    "hashtags": ["#yearProgress", "#motivation", "#timeflies", "#goals", "#productivity"]
+  },
+  "horoscope": {
+    "templates": [
+      "✨ {sign} Daily Horoscope ✨\n\n{content}",
+      "🔮 {sign} - {date} 🔮\n\n{content}",
+      "Your {sign} Reading for Today:\n\n{content}"
+    ],
+    "hashtags": ["#horoscope", "#zodiac", "#astrology", "#dailyhoroscope"]
+  }
+}

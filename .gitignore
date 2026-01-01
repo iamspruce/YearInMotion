@@ -1,0 +1,58 @@
+# Dependencies
+node_modules/
+jspm_packages/
+
+# Build output
+dist/
+build/
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Generated content
+videos/*
+!videos/.gitkeep
+logs/*
+!logs/.gitkeep
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+desktop.ini
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+.project
+.classpath
+.settings/
+
+# Test coverage
+coverage/
+*.lcov
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# TypeScript
+tsconfig.tsbuildinfo
