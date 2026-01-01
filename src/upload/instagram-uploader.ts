@@ -167,16 +167,28 @@ export class InstagramUploader extends BaseUploader {
     }
 
     /**
-     * Upload to Cloudinary (implement when needed)
+     * Upload to Cloudinary
      */
-    private async uploadToCloudinary(_videoPath: string): Promise<string> {
-        // TODO: Implement Cloudinary upload
-        // npm install cloudinary
-        // const cloudinary = require('cloudinary').v2;
-        // cloudinary.config({...});
-        // const result = await cloudinary.uploader.upload(videoPath, { resource_type: 'video' });
-        // return result.secure_url;
-        throw new Error('Cloudinary upload not implemented yet');
+    private async uploadToCloudinary(videoPath: string): Promise<string> {
+        const { v2: cloudinary } = await import('cloudinary');
+
+        cloudinary.config({
+            cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+            api_key: process.env.CLOUDINARY_API_KEY,
+            api_secret: process.env.CLOUDINARY_API_SECRET,
+            secure: true,
+        });
+
+        logger.info('Uploading video to Cloudinary...', { videoPath });
+
+        const result = await cloudinary.uploader.upload(videoPath, {
+            resource_type: 'video',
+            folder: 'year-in-motion',
+            public_id: `progress_${Date.now()}`,
+        });
+
+        logger.info('Cloudinary upload successful', { url: result.secure_url });
+        return result.secure_url;
     }
 
     /**

@@ -72,17 +72,30 @@ export class FacebookUploader extends BaseUploader {
         logger.info('Facebook upload initialized', { videoId });
 
         // Step 2: Upload video file
+        const videoSize = fs.statSync(videoPath).size;
         const formData = new FormData();
         formData.append('video_file_chunk', fs.createReadStream(videoPath));
 
-        await axios.post(uploadUrl, formData, {
-            headers: {
-                ...formData.getHeaders(),
-                Authorization: `OAuth ${this.accessToken}`,
-            },
-            maxContentLength: Infinity,
-            maxBodyLength: Infinity,
-        });
+        try {
+            await axios.post(uploadUrl, formData, {
+                headers: {
+                    ...formData.getHeaders(),
+                    Authorization: `OAuth ${this.accessToken}`,
+                    'file_size': videoSize,
+                },
+                maxContentLength: Infinity,
+                maxBodyLength: Infinity,
+            });
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                logger.error('Facebook upload step 2 failed', {
+                    status: error.response?.status,
+                    data: error.response?.data,
+                    headers: error.response?.headers,
+                });
+            }
+            throw error;
+        }
 
         logger.info('Facebook video uploaded', { videoId });
 
