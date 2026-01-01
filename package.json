@@ -18,6 +18,7 @@
     "dry-run": "DRY_RUN=true tsx src/index.ts",
     "test-post": "DRY_RUN=false FORCE_POST=true tsx src/index.ts",
     "test-dry-run": "DRY_RUN=true FORCE_POST=true tsx src/index.ts",
+    "reset-state": "tsx scripts/reset-state.ts",
     "typecheck": "tsc --noEmit"
   },
   "keywords": [
