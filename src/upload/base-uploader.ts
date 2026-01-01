@@ -1,3 +1,4 @@
+import fs from 'fs';
 import type { UploadResult, UploadOptions, Platform } from '../types/index.js';
 import { logger } from '../utils/logger.js';
 import { RETRY_CONFIG } from '../config/index.js';
@@ -114,7 +115,6 @@ export abstract class BaseUploader {
      * Validate video file exists and is readable
      */
     protected validateVideoFile(videoPath: string): void {
-        const fs = require('fs');
         if (!fs.existsSync(videoPath)) {
             throw new Error(`Video file not found: ${videoPath}`);
         }
