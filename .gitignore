@@ -56,3 +56,9 @@ lerna-debug.log*
 
 # TypeScript
 tsconfig.tsbuildinfo
+
+# Local documentation (Not published to GitHub)
+SETUP.md
+EXTENDING.md
+TROUBLESHOOTING.md
+src/generators/horoscope-generator.example.ts
