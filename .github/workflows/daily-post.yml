@@ -2,8 +2,9 @@ name: Daily Year Progress Video
 
 on:
   schedule:
-    # Run daily at midnight UTC
-    - cron: '0 0 * * *'
+    # Run daily at 01:05 UTC (02:05 AM in your local time)
+    # This avoids the "midnight rush" where GitHub Action queues are longest.
+    - cron: '05 1 * * *'
   workflow_dispatch:
     # Allow manual triggering
     inputs:
